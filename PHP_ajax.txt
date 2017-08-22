@@ -1,0 +1,201 @@
+angular ng-repaet
+
+    <div ng-repeat="link in links track by $index">{{link.name}}</div>
+
+//
+novalidate 属性规定当提交表单时不对其进行验证。
+
+serialize 返回输出序列化表单值的结果。（必须有name）
+//phpstudy
+配置文件 
+php-ini
+timezone
+//
+
+php
+
+print_r
+var_dump
+echo
+
+echo <<< AAA
+
+AAA
+要空一行
+
+判断变量的类型是 gettype 
+
+is_int()
+is_numeric()
+is_string()
+is_bool()
+返回bool值 
+echo 输出时候
+
+true返回1
+false不返回
+
+判断变量是不是空值
+
+empty()
+
+如果变量是
+
+"" (空字符串)
+0 (作为整数的0)
+0.0 (作为浮点数的0)
+"0" (作为字符串的0)
+NULL
+FALSE
+array() (一个空数组)
+$var; (一个声明了，但是没有值的变量)
+
+则判断为真
+
+一般这样用
+if(!empty($av)){
+    空
+}；
+
+isset();一般用来检测变量是否设置
+
+
+字符串
+
+strlen($str);字符串的长度
+substr($str,4,1);截取字符串   第2位为从几位开始  第3位 是截取几个（可取负值 返回余下的字符）//很想splice
+
+str_ireplace('','',$str)   i表示模糊大小写
+strstr($str,'');第二位表示截取自遇到第1个这个字符往后的所有字符；
+
+
+explode(" ",$str) 把字符串变成数组  第一位不能为空字符 不常用的第3为是限定数组元素个数 当元素个数不够，把多的都放在最后1个数组元素上
+
+
+implode(" ",$arr) 把数组变成字符串 第一位可为空字符
+
+json_encode  数组转变成字符串
+json_decode  字符串转换成数组    
+
+
+
+ajax
+
+                <form action="form_data.php" class="" method="post" onsubmit="return login()">
+			目标php文件                     传送数据采取方法      提交触发的方法 一定要写返回 false 阻止提交进行的跳转
+在返回值前 写我们的ajax 完成异步交互
+                    <div class="form-group">
+
+                        <label for="">用户名</label>
+
+                        <input id="user" name="user" value="tom" type="text" class="form-control">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="">密码</label>
+
+                        <input id="pass" name="pass" value="123456" type="password" class="form-control">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <button class="btn btn-primary">登录</button>
+
+                    </div>
+
+                </form>
+
+
+ 	function login() {
+            var un = $('#user').val();
+            var pw = $('#pass').val();
+            if (un.length < 3) {
+                $('#user').focus;
+                alert("用户名必须3个字符以上！");
+                return false;
+            }
+            if (pw.length < 6) {
+                $('#pass').focus;
+                alert("密码必须6个字符以上！");
+                return false;
+            }
+            //AJAX 异步通讯
+            $.get("form_data.php", { user: un, pass: pw }, function (data) {
+                console.log("data =", data);
+                $('#info').html(data.text);
+                $('#sec').html(data.content);
+                if (data.error) {
+                    if (!$('#sec').hasClass('hide')) {
+                        $('#sec').addClass('hide');
+                    }
+                } else {
+                    if ($('#sec').hasClass('hide')) {
+                        $('#sec').removeClass('hide');
+                    }
+                }
+            }, "json");
+            return false;
+        };
+
+  
+ /*
+            $.ajax({
+                url:"form_data.php",	
+                method:"GET",
+                data:{user:un,pass:pw},
+                dataType:"html",  //"text","json","jsonp"
+                success: function(data){},
+                error: function(data){}
+            })
+ */
+
+
+AJAX 异步通讯
+	$.get("form_data.php",{user:  ,pass:  },function(data){
+//第一位是目标php文件 第二位是传送的数据   第三位是返回的数据 第四位是返回的数据的格式（如果不写返回的是字符串）
+
+
+
+},"json");
+
+
+//php文件
+
+<?php
+if(!isset($_REQUEST["user"],$_REQUEST["pass"])){
+    exit("表单为空！");
+}
+
+//先看能否获取值
+
+$user=trim($_REQUEST["user"]);
+$pass=trim($_REQUEST["pass"]);
+
+//去除前后的空格
+
+$res = [
+    "error"=>false,
+    "content"=>"",
+    "text"=>""
+];
+//用数据方式处理问题
+
+//如果获取的值  和这些值判断
+
+//记住 标签的什么的存的是字符串！
+if($user == "tom" && $pass == "123456"){
+    $res["content"] = '<a href="javascript:;">我的支付宝</a>';
+    $res["text"] = "登录成功!";
+}else{
+    $res["error"] = true;
+    $res["text"] = "登录失败";
+}
+
+//把数据变成字符串，传送到前端
+
+$arr = json_encode($res);
+echo $arr;
+

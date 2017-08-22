@@ -1,0 +1,142 @@
+前端工作环境搭建
+1、准备工作
+    必选软件(
+1、c++ 2012; c++2015 Redistributable x64;c++2015 Redistributable x86;
+2、VScode;
+3、NodeJs;
+4、Git 最新版；
+.net 4.5（可选，提供一个可消除脚本环境或解释环境的性能问题的代码执行环境）；
+可选软件：
+1、压缩软件BandZip
+2、Chrome 最新版；
+3、jdk 1.8；
+4、Google 或者QQinput 输入法
+
+2、 开始搭建
+安装C++库；
+安装Git；
+安装.Net 4.5；
+安装VScode；
+安装NodeJs平台(安装时，请安装至C盘根目录，且不含空格的路径；)；
+
+
+3、NodeJs平台配置
+npm i -g smart-npm  //（npm install --global smart-npm）安装smart -npm后可以使用snmp 命令来链接国内的node镜像淘宝服务器；
+snpm   i -g http-server //安装本地 mini http-server 可以用来简单的调试使用，默认接口（：8080）使用上限为50 IP；        
+http-server -p XXX  这条命令是用来更改xxx ，xxx代表的端口号（一般网址接口：80）；
+snpm i -g bower   // 安装bower，bower 的作用有点 类似于 liunx 系统的 apt—get 或者yum的作用
+snpm i -g cordova // Cordova提供了一组设备相关的API，通过这组API，移动应用能够以JavaScript访问原生的设备功能，如摄像头、麦克风等。Cordova还提供了一组统一的JavaScript类库，以及为这些类库所用的设备相关的原生后台代码。Cordova支持如下移动操作系统：iOS, Android,ubuntu phone os, Blackberry, Windows Phone, Palm WebOS, Bada 和 Symbian。
+snpm i -g gulp  //全局安装Gulp，Gulp.js 是一个自动化构建工具,开发者可以使用它在项目开发过程中自动执行常见任务
+bower i --save bootstrap // 下载 BootStrap&Jquery 由于下载  Bootstrap后会自动下载Jquery ；
+cordova create app //创建 名称为APP的项目，名称可以更改；
+snpm i --save gulp-sass //下载gulp-sass
+bower i --sava-dev angular //安装angular
+npm init  //（初始化创建package.json）nodejs中用npm初始化来创建package.json的方法；
+bower init  //bower 初始化，在需要输入确定时，点击Y确认；
+在项目根目录创建文件夹sass，并在文件夹中创建sass.scss,配置成功之后将会在./www/css下生成sass.css文件
+gulp 配置
+    snpm i --save gulp  将gulp安装在本地；
+   在本地项目APP根目录中执行snpm i --save gulp ，执行成功之后将会在本地生成node_modules 文件夹；
+如果报错，请先执行snpm install;
+bower i --save bootstrap
+结合gulp配置安装 BrowserSync
+在APP根目录创建 gulpfile.js 文件，gulpfile.js 必须在项目根目录下！依照gulpfile创建脚本内容
+脚本创建完成之后，命令行运行 gulp；
+创建测试网页
+
+gulpfile 配置
+/* gulpfile.js 必须在项目根目录下！ */
+/* 第一次执行是全局安装的 gulp */
+// 装载组件 gulp，来源于本地安装
+// 如果报错，往往需要先执行 snpm install
+var gulp = require("gulp"); // 加载组件并实例化
+// 四大方法：
+// 1. 事件、事务：  .task()
+// 2. 源文件：      .src()
+// 3. 目标文件：    .dest()
+// 4. 监视器：      .watch()
+// 5. 管道（功能）：.pipe()
+// SASS 编译实例
+var sass = require("gulp-sass");//加载组建
+// 服务器实例
+var browserSync = require("browser-sync").create(); // 加载组件并服务实例化
+
+// 本地服务器（浏览器）服务事务
+gulp.task("serve", function () {
+    browserSync.init({
+        server: {
+            baseDir: "./www/"
+        }
+    });
+});
+// jquery, bootstrap 复制相关插件
+gulp.task("copy", function () {
+    var path = "./bower_components/bootstrap/dist/";
+    gulp.src(path + "css/*.css")
+        .pipe(gulp.dest("./www/css/"));
+    gulp.src(path + "fonts/*.*")
+        .pipe(gulp.dest("./www/fonts/"));
+    gulp.src(path + "js/*.js")
+        .pipe(gulp.dest("./www/js/"));
+    path = "./bower_components/jquery/dist/";
+    var file = [path + "jquery.js", path + "jquery.min.js"];
+    gulp.src(file).pipe(gulp.dest("./www/js/"));
+});
+// 拷贝 index.html 输出到 www
+// */ 表示包含一级子目录，**/ 表示包含所有子目录
+// ! 表示不包含，只需在类型字符串最开头部分加入即可
+gulp.task("html", function () {
+    gulp.src(["./src/**/*.html", "!./src/**/_*.html"])
+        .pipe(gulp.dest("./www/"));
+});
+// 拷贝样式表 *.css 输出到 www/css
+gulp.task("css", function () {
+    gulp.src(["./src/css/**/*.css", "!./src/css/**/_*.css"])
+        .pipe(gulp.dest("./www/css/"));
+});
+// 拷贝脚本 *.js 输出到 www/js
+gulp.task("js", function () {
+    gulp.src(["./src/js/**/*.js", "!./src/js/**/_*.js"])
+        .pipe(gulp.dest("./www/js/"));
+});
+// SASS 编译与输出
+gulp.task("sass", function () {
+    gulp.src("./src/sass/**/*.scss")
+        .pipe(sass.sync().on('error', sass.logError))
+        .pipe(sass({
+            outputStyle: 'expanded'//有多种模式
+        }))
+        .pipe(gulp.dest("./www/css/"));
+});
+// 创建监视器
+gulp.task("watch", function () {
+    //gulp.watch("", function(){});
+    gulp.watch("./src/**/*.html", ["html"]);
+    gulp.watch("./src/css/**/*.css", ["css"]);
+    gulp.watch("./src/sass/**/*.scss", ["sass"]); // <=== sass
+    gulp.watch("./src/js/**/*.js", ["js"]);
+    // 根据www文件改动情况自动刷新浏览器：
+    gulp.watch("./www/**/*.*", ["refresh"]);
+});
+// 刷新浏览器
+gulp.task("refresh", function () {
+    browserSync.reload();
+});
+// 默认事务
+gulp.task("default", [
+    "copy", // 拷贝 jq, bt
+    "sass", // <=== SASS 编译
+    "html", "css", "js", // 复制自己的代码
+    "serve", // 创建浏览器同步服务器
+    "watch" // 监视文档、刷新浏览器
+]);
+
+BrowserSync 配置
+
+snpm i -g browser-sync //全局BrowserSync文件；
+npm install --save-dev browser-sync //结合gulpjs或gruntjs构建工具来使用
+
+
+
+    
+
